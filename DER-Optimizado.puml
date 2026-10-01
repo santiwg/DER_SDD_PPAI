@@ -97,7 +97,6 @@ package "Pagos, cobros y medios" {
     id <<PK>>
     --
     fechaYHora
-    monto
     medio <<FK>>
     cheque <<FK>>
     cliente <<FK>>
@@ -206,7 +205,6 @@ package "Compras" {
     email
     cuit
     cuil
-    estado
   }
 
   entity "Compra" as compra {
@@ -300,6 +298,7 @@ package "Produccion y reparto" {
     --
     producto <<FK>>
     cantidad
+    instanciaProduccion <<FK>>
   }
 
   entity "Reparto" as reparto {
@@ -449,7 +448,7 @@ package "Usuarios y auditoria" {
 ' ============================================================
 
 ' Ventas y clientes
-venta ||--o{ detalleventa
+venta ||--|{ detalleventa
 detalleventa }o--|| productosucursal
 cliente ||--o{ venta
 cliente ||--o{ cobro
@@ -464,7 +463,7 @@ insumo ||--o{ precioinsumo
 precioinsumo }o--|| proveedor
 
 ' Productos e insumos
-producto ||--o{ itemreceta
+producto ||--|{ itemreceta
 itemreceta }o--|| insumo
 producto }o--|| unidad
 insumo }o--|| unidad
@@ -473,41 +472,40 @@ sucursal ||--o{ productosucursal
 insumo ||--o{ insumosucursal
 sucursal ||--o{ insumosucursal
 tipoproducto ||--o{ producto
-producto }o--|| factorcomplejidad
 
 ' Compras y proveedores
-compra ||--o{ detallecompra
+compra ||--|{ detallecompra
 detallecompra }o--|| insumosucursal
 proveedor ||--o{ compra
 proveedor ||--o{ pago
 compra }o--|| estado
 
 ' Pagos y cobros
-pago ||--o{ detallepago
+pago ||--|{ detallepago
 detallepago }o--|| compra
-cobro ||--o{ detallecobro
+cobro ||--|{ detallecobro
 detallecobro }o--|| venta
 pago }o--|| mediopago
 cobro }o--|| mediopago
-pago ||--o| cheque
-cobro ||--o| cheque
+pago |o--o| cheque
+cobro |o--o| cheque
 cheque }o--|| estado
 
 ' Produccion y reparto
-instanciadeproduccion ||--o{ detalleinstanciadeproduccion
+instanciadeproduccion ||--|{ detalleinstanciadeproduccion
 detalleinstanciadeproduccion }o--|| producto
 instanciadeproduccion }o--|| empleado
 instanciadeproduccion }o--|| sucursal
 instanciadeproduccion ||--o{ reparto
 reparto }o--|| sucursal
-reparto ||--o{ detallereparto
+reparto ||--|{ detallereparto
 detallereparto }o--|| detalleinstanciadeproduccion
 sucursal }o--|| ciudad
 
 ' Movimientos y ajustes de stock
 movimientostock }o--|| tipomovimiento
-productosucursal ||--o{ movimientostock
-insumosucursal ||--o{ movimientostock
+productosucursal |o--o{ movimientostock
+insumosucursal |o--o{ movimientostock
 ajustestock }o--o| productosucursal
 ajustestock }o--o| insumosucursal
 ajustestock }o--|| usuario
@@ -521,9 +519,9 @@ rolempleado }o--|| area
 
 ' Promociones
 promocion }o--|| tipopromocion
-promocion ||--o{ promocionproducto
+promocion ||--|{ promocionproducto
 promocionproducto }o--|| producto
-promocion ||--o{ promociontipocliente
+promocion ||--|{ promociontipocliente
 promociontipocliente }o--|| tipocliente
 
 ' Usuarios y trazabilidad
